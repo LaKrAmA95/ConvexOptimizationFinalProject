@@ -47,8 +47,14 @@ class RidgeRegression(nn.Module):
 #Y: Shape n x 1 where n is the number of samples
 #lr: learning rate
 #epochs: number of epochs
+#batch_size: batch size
+#momentum: momentum
+#dampening: dampnent constant
+#nesterov: True to Enable Nesterov Momentum Computation
+#decay_factor: Decay Factor for RMSProp
+#optimizer_code: 0 for SGD, 1 for Adagrad, 2 for RMSProp
 #bias: whether we have intercept or not
-def SGD1(X: np.ndarray, Y: np.ndarray, lr, epochs, batch_size, bias = False):
+def SGD1(X: np.ndarray, Y: np.ndarray, lr = 0.005, epochs = 500, batch_size = 1, momentum = 0, dampening = 0, nesterov = False, decay_factor = 0, optimizer_code = 0, bias = False):
     #Initialize Cost Function
     cost_function = LeastSquares(X.shape[1])
     
@@ -56,8 +62,14 @@ def SGD1(X: np.ndarray, Y: np.ndarray, lr, epochs, batch_size, bias = False):
     X = torch.tensor(X, dtype = torch.float32)
     Y = torch.tensor(Y, dtype = torch.float32)
     
-    #Initialize SGD Optimizer
-    optimizer = optim.SGD(cost_function.parameters(), lr = lr)
+    #Initialize Optimizer
+    optimizer = None
+    if optimizer_code == 0:
+        optimizer = optim.SGD(cost_function.parameters(), lr = lr, momentum = momentum, dampening = dampening, nesterov = nesterov)
+    elif optimizer_code == 1:
+        optimizer = optim.Adagrad(cost_function.parameters(), lr = lr)
+    elif optimizer_code == 2:
+        optimizer = optim.RMSprop(cost_function.parameters(), lr = lr, alpha = decay_factor, momentum = momentum)
     
     #Store batch loss values
     loss_values = []
@@ -93,6 +105,7 @@ def SGD1(X: np.ndarray, Y: np.ndarray, lr, epochs, batch_size, bias = False):
 
     weights = cost_function.linear.weight.data.numpy().reshape((-1, 1)) #Return weights as numpy array
 
+    #return weights and bias
     if bias:
         return weights, cost_function.linear.bias.item(), loss_values
     else:
@@ -102,8 +115,16 @@ def SGD1(X: np.ndarray, Y: np.ndarray, lr, epochs, batch_size, bias = False):
 #X: Shape n x d where n is the number of samples and d is the number of features
 #Y: Shape n x 1 where n is the number of samples
 #lamb: ridge parameter
+#lr: learning rate
+#epochs: number of epochs
+#batch_size: batch size
+#momentum: momentum
+#dampening: dampnent constant
+#nesterov: True to Enable Nesterov Momentum Computation
+#decay_factor: Decay Factor for RMSProp
+#optimizer_code: 0 for SGD, 1 for Adagrad, 2 for RMSProp
 #bias: whether we have intercept or not
-def SGD2(X: np.ndarray, Y: np.ndarray, lamb, lr, epochs, batch_size, bias = False):
+def SGD2(X: np.ndarray, Y: np.ndarray, lamb = 0.1, lr = 0.005, epochs = 500, batch_size = 1, momentum = 0, dampening = 0, nesterov = False, decay_factor = 0, optimizer_code = 0, bias = False):
     #Initialize Cost Function
     cost_function = RidgeRegression(X.shape[1], lamb)
     
@@ -111,8 +132,14 @@ def SGD2(X: np.ndarray, Y: np.ndarray, lamb, lr, epochs, batch_size, bias = Fals
     X = torch.tensor(X, dtype = torch.float32)
     Y = torch.tensor(Y, dtype = torch.float32)
     
-    #Initialize SGD Optimizer
-    optimizer = optim.SGD(cost_function.parameters(), lr = lr)
+    #Initialize Optimizer
+    optimizer = None
+    if optimizer_code == 0:
+        optimizer = optim.SGD(cost_function.parameters(), lr = lr, momentum = momentum, dampening = dampening, nesterov = nesterov)
+    elif optimizer_code == 1:
+        optimizer = optim.Adagrad(cost_function.parameters(), lr = lr)
+    elif optimizer_code == 2:
+        optimizer = optim.RMSprop(cost_function.parameters(), lr = lr, alpha = decay_factor, momentum = momentum)
     
     #Store batch loss values
     loss_values = []
@@ -148,6 +175,7 @@ def SGD2(X: np.ndarray, Y: np.ndarray, lamb, lr, epochs, batch_size, bias = Fals
 
     weights = cost_function.linear.weight.data.numpy().reshape((-1, 1)) #Return weights as numpy array
 
+    #return weights and bias
     if bias:
         return weights, cost_function.linear.bias.item(), loss_values
     else:
