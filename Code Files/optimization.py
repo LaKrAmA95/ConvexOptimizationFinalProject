@@ -56,7 +56,7 @@ class RidgeRegression(nn.Module):
 #bias: whether we have intercept or not
 def SGD1(X: np.ndarray, Y: np.ndarray, lr = 0.005, epochs = 500, batch_size = 1, momentum = 0, dampening = 0, nesterov = False, decay_factor = 0, optimizer_code = 0, bias = False):
     #Initialize Cost Function
-    cost_function = LeastSquares(X.shape[1])
+    cost_function = LeastSquares(X.shape[1], bias)
     
     #Convert X and Y to pytorch tensors
     X = torch.tensor(X, dtype = torch.float32)
@@ -126,7 +126,7 @@ def SGD1(X: np.ndarray, Y: np.ndarray, lr = 0.005, epochs = 500, batch_size = 1,
 #bias: whether we have intercept or not
 def SGD2(X: np.ndarray, Y: np.ndarray, lamb = 0.1, lr = 0.005, epochs = 500, batch_size = 1, momentum = 0, dampening = 0, nesterov = False, decay_factor = 0, optimizer_code = 0, bias = False):
     #Initialize Cost Function
-    cost_function = RidgeRegression(X.shape[1], lamb)
+    cost_function = RidgeRegression(X.shape[1], lamb, bias)
     
     #Convert X and Y to pytorch tensors
     X = torch.tensor(X, dtype = torch.float32)
