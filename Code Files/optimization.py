@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 #Cost Function[Least Squares]
-#||Xw - y ||_2^2
+#1/n ||(XW + b) - Y||_2^2
 class LeastSquares(nn.Module):
     def __init__(self, input_dim, bias = False):
         super(LeastSquares, self).__init__() #Initialize class
@@ -20,7 +20,7 @@ class LeastSquares(nn.Module):
         return mse_loss(self.linear(X), y)
 
 #Cost Function[Least Squares + L2 Regularization Term]
-#||Xw - y ||_2^2 + lambda * ||w||^2_2
+#1/n ||(XW + b) - Y ||_2^2 + lambda * ||w||^2_2
 class RidgeRegression(nn.Module):
     def __init__(self, input_dim, lambda1, bias = False):
         super(RidgeRegression, self).__init__()
@@ -37,10 +37,7 @@ class RidgeRegression(nn.Module):
             
     #Calculate value of lambda * ||w||^2_2
     def l2_regularization(self):
-        l2_reg = 0
-        for param in self.parameters():
-            l2_reg += torch.norm(param) ** 2
-        return self.lambda1 * l2_reg
+        return self.lambda1 * (torch.norm(self.linear.weight) ** 2)
 
 #Optimize the Least Squares Cost Function via Stochastic Gradient Descent
 #X: Shape n x d where n is the number of samples and d is the number of features
